@@ -13,34 +13,48 @@ fig = plt.figure(figsize=(7, 7))
 ax = Axes3D(fig, azim=-40, elev=30)
 sphere = Bloch(axes=ax)
 
-delta = 0.2 * 2*np.pi # coupling rate
-eps0 = 1 * 2*np.pi  # dephasing rate
-gamma = 0.5  # decoherence rate
-# H = Qobj()
-H = - delta/2.0 * sigmax() - eps0/2.0 * sigmaz()
-
 t_length = 100
-t_list = np.linspace(0, 15, t_length)
+t_list = np.linspace(0, 350, t_length)
+print(t_list[1:10])
+
+# initial state
+a = 1
+psi0 = (a * basis(2, 0) + (1 - a) * basis(2, 1)) / (np.sqrt(a**2 + (1 - a)**2))
 # psi0 = rand_ket(2) #random initial state
-a = 1/np.sqrt(2)
-psi0 = Qobj([[a],[a]])
-print(t_list[1])
+# psi0 = Qobj([[1 / np.sqrt(2)], [1 / np.sqrt(2)]]) #define initial ket with qobj
+
+# exchange rates
+w = 1 * 2 * np.pi  # qubit precession rate (qubit angular frequency)
+delta = 2 * 2 * np.pi  # coupling rate
+theta = 0.05 * np.pi      # qubit angle from sigma_z axis (toward sigma_x axis)
+gamma1 = 0.05       # qubit relaxation rate
+gamma2 = 0.0007  # qubit dephasing / decoherence rate (T2)
+
+# Hamiltonian
+H = - delta/2.0 * sigmax() - w/2.0 * sigmaz()
+
+# Operators for which the expectations are computed upon
 e_ops = [sigmax(), sigmay(), sigmaz()]
 
+# Bloch-Redfield master equation
+# def ohmic_spectrum(wn): # wn here is noise spectrum range, not qubit freq
+#     if wn == 0: # dephasing inducing noise
+#         return gamma2
+#     else: # relaxation inducing noise
+#         return gamma2 / 2 * (wn / (2 * np.pi)) * (wn > 0)
 
-def ohmic_spectrum(w):
-    if w == 0:
-        return gamma
-    else:
-        return gamma/2 * (w/(2*np.pi)) * (w > 0)
+# R, ekets = bloch_redfield_tensor(H, [sigmax()], [ohmic_spectrum])
+# np.real(R.full())
+# expt_list = bloch_redfield_solve(R, ekets, psi0, t_list, e_ops)
 
+# Lindblad Master Equation Solver
 def qubit_integrate(w, theta, gamma1, gamma2, psi0, tlist):
     # operators and the hamiltonian
     sx = sigmax()
     sy = sigmay()
     sz = sigmaz()
-    sm = sigmam()
-    H = w * (np.cos(theta) * sz + np.sin(theta) * sx)
+    sm = sigmam() # Sigma minus
+    # H = w * (np.cos(theta) * sz + np.sin(theta) * sx)
     # collapse operators
     c_op_list = []
     n_th = 0.5  # temperature
@@ -55,25 +69,10 @@ def qubit_integrate(w, theta, gamma1, gamma2, psi0, tlist):
         c_op_list.append(np.sqrt(rate) * sz)
 
     # evolve and calculate expectation values
-    output = mesolve(H, psi0, tlist, c_op_list, [sx, sy, sz])
+    output = mesolve(H, psi0, tlist, c_op_list, e_ops)
     return output
 
-# Bloch Redfield method
-# R, ekets = bloch_redfield_tensor(H, [sigmax()], [ohmic_spectrum])
-# np.real(R.full())
-# expt_list = bloch_redfield_solve(R, ekets, psi0, t_list, e_ops)
-
-# Qubit Integrate
-w = 1.0 * 2 * np.pi  # qubit angular frequency
-theta = 0.2 * np.pi      # qubit angle from sigma_z axis (toward sigma_x axis)
-gamma1 = 0.5             # qubit relaxation rate
-gamma2 = 0.2             # qubit dephasing rate
-# initial state
-a = 1.0
-psi0 = (a * basis(2, 0) + (1 - a) * basis(2, 1)) / (np.sqrt(a**2 + (1 - a)**2))
-tlist = np.linspace(0, 4, 150)
-
-result = qubit_integrate(w, theta, gamma1, gamma2, psi0, tlist)
+result = qubit_integrate(w, theta, gamma1, gamma2, psi0, t_list)
 expt_list = result.expect
 
 # Displaying results
@@ -86,7 +85,8 @@ def animate(j):
     sphere.clear()
     print('\n' * 37)
     print(np.array([j, sx[j], sy[j], sz[j]]))
-    sphere.add_vectors(np.array([delta, 0, eps0]) / np.sqrt(delta ** 2 + eps0 ** 2)) #Quantization axis
+    # sphere.add_vectors([np.sin(theta), 0, np.cos(theta)])
+    sphere.add_vectors(np.array([delta, 0, w]) / np.sqrt(delta ** 2 + w ** 2)) #Quantization axis
     sphere.add_points(np.array([sx[:j + 1], sy[:j + 1], sz[:j + 1]]))
     sphere.add_vectors(np.array([sx[j].real, sy[j].real, sz[j].real]))
     sphere.make_sphere()
