@@ -1,3 +1,6 @@
+# To illustrate Ramsey operation by figuratively moving around bloch sphere
+# with spherical coordinates
+
 import matplotlib
 matplotlib.use('tkAgg')
 
@@ -9,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 
+# Config Bloch Sphere
 fig = plt.figure(figsize=(7, 7))
 ax = Axes3D(fig, azim=-25, elev=12) #azim: camera-right's deg from y-axis, elev: camera-up's deg from horizontal
 sphere = Bloch(axes=ax)
@@ -20,6 +24,7 @@ anisphere.sphere_color = 'yellow'
 anisphere.vector_width = 4.8
 anisphere.vector_color = 'red'
 anisphere.point_marker = 'o'
+
 turns = 10.8/8
 delay = int(np.ceil(turns * 2*30))
 t_length = [35,delay,35]
