@@ -109,6 +109,6 @@ def animate(j):
 ani = animation.FuncAnimation(fig, animate, arange(t_length) + int((t_length +1)/2),
                               interval=25, repeat=False, blit=False)
 #Install FFMPEG using: brew install ffmpeg
-ani.save('QubitsHback.mp4', fps=15)
+# ani.save('QubitsHback.mp4', fps=15)
 
 plt.show()
