@@ -29,7 +29,7 @@ sphere.point_marker = 'o'
 # sphere01.vector_color = 'red'
 # sphere01.point_marker = 'o'
 
-Inistate = snot(1)*basis(2,0)
+Inistate = basis(2, 0) #snot(1)*basis(2, 0)
 t_length = 101
 rotrange = linspace(0, 100, t_length)
 rotrange2 = linspace(0, 100/2, int((t_length+1)/2))
@@ -96,8 +96,8 @@ print(R1)
 
 def animate(j):
     sphere.clear()
-    sphere.add_points([xh[:j+1], yh[:j+1], zh[:j+1]])
-    sphere.add_vectors([xh[j], yh[j], zh[j]])
+    sphere.add_points([x1[:j+1], y1[:j+1], z1[:j+1]])
+    sphere.add_vectors([x1[j], y1[j], z1[j]])
     sphere.make_sphere()
     # sphere01.clear()
     # sphere01.add_vectors([x1[j], y1[j], z1[j]])
@@ -106,9 +106,11 @@ def animate(j):
 
 
 # animation starts
-ani = animation.FuncAnimation(fig, animate, arange(t_length) + int((t_length +1)/2),
+framerange = arange(len(rotrange)) # for X, Y, Z gate
+# framerange = arange(t_length) + int((t_length + 1)/2) # for Hback gate
+ani = animation.FuncAnimation(fig, animate, framerange,
                               interval=25, repeat=False, blit=False)
 #Install FFMPEG using: brew install ffmpeg
-# ani.save('QubitsHback.mp4', fps=15)
+ani.save('QubitsRx.mp4', fps=15)
 
-plt.show()
+# plt.show()
