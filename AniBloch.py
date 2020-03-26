@@ -11,11 +11,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 fig = plt.figure(figsize=(7, 7))
 ax = Axes3D(fig, azim=-80, elev=20)
-sphere = Bloch(axes=ax)
-# b3d = Bloch3d()
-anisphere = Bloch(axes=ax)
-t_length = [37,100]
 
+t_length = [37,100]
 #POINTS
 pnt = [1 / np.sqrt(3), 1 / np.sqrt(3), 1 / np.sqrt(3)]
 vec = [0, 1, 0]
@@ -31,25 +28,33 @@ yp = [np.sin(phi)*sin(th) for th in np.linspace(0, 0.5 * pi, t_length[0])]
 zp = [np.cos(th) for th in np.linspace(0, 0.5 * pi, t_length[0])]
 pnts = [xp, yp, zp]
 
-sphere.add_points(pnt)
+sphere = Bloch(axes=ax)
+# sphere.add_points(pnt)
 sphere.add_points(pnts)
 sphere.add_vectors(vec)
-sphere.add_states(up)
-sphere.add_states([x, y, z])
+# sphere.add_states(up)
+# sphere.add_states([x, y, z])
+sphere.save(dirc='temp')
 
+# anisphere = Bloch3d()
+anisphere = Bloch(axes=ax)
 # anisphere.add_states([x, y, z])
-
 def animate(j):
     anisphere.clear()
-    # anisphere.add_points(np.array([xp[:j+1],yp[:j+1],zp[:j+1]]))
-    anisphere.add_vectors(np.array([xp[j], yp[j], zp[j]]))
+    # anisphere.add_points([xp[j], yp[j], zp[j]])
+    anisphere.add_vectors([xp[j], yp[j], zp[j]])
+    # anisphere.save(dirc='temp') #saving images to temp directory in current working directory
     anisphere.make_sphere()
     return anisphere
 
+def init():
+    anisphere.vector_color = ['r']
+    return ax
+
 # animation starts
 ani = animation.FuncAnimation(fig, animate, np.arange(t_length[0]),
-                              interval=25, repeat=False, blit=False)
+                              init_func=init, interval=25, repeat=False, blit=False)
 #Install FFMPEG using: brew install ffmpeg
-# ani.save('Redfield.mp4', fps=15)
+ani.save('Redfield.mp4', fps=15)
 
-anisphere.show()
+# anisphere.show()

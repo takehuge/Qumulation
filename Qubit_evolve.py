@@ -99,7 +99,7 @@ def init():
 ani = animation.FuncAnimation(fig, animate, np.arange(t_length),
                               init_func=init, interval=25, repeat=False, blit=False)
 #Install FFMPEG using: brew install ffmpeg
-ani.save('Redfield.mp4', fps=15)
+ani.save('Redfield01.mp4', fps=15)
 
 sphere.show()
 
